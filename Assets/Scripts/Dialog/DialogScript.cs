@@ -76,21 +76,13 @@ public class DialogTutorial : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Mouse0) && _text.text == _sentences[2])
             {
                 _isFirePressed = true;
+                NextSentence();
             }
             
             if (_aPressed && _dPressed && _wPressed && _sPressed && !_isAllMovementPressed)
             {
-                _text.text = "";
                 _isAllMovementPressed = true;
-                _index++;
-                StartCoroutine(Type());
-            }
-
-            if (_isFirePressed)
-            {
-                _text.text = "";
-                _index++;
-                StartCoroutine(Type());
+                NextSentence();
             }
         }
     }
@@ -108,14 +100,11 @@ public class DialogTutorial : MonoBehaviour
     public void NextSentence()
     {
         _continueButton.SetActive(false);
-        Debug.Log(_index);
         if (_index < _sentences.Length - 1)
         {
             _index++;
             _text.text = "";
             StartCoroutine(Type());
-
-
         }
         else
         {
