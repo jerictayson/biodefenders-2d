@@ -2,6 +2,16 @@ using UnityEngine;
 
 namespace Player
 {
+    
+    //create enum for player state
+    public enum PlayerState
+    {
+        Idle,
+        Running,
+        Jumping,
+        Attacking
+    }
+    
     public class PlayerMovement : MonoBehaviour
     {
         private float _horizontal;
@@ -12,6 +22,10 @@ namespace Player
         private float _moveSpeed = 5f;
         [SerializeField]
         private LayerMask _groundLayer;
+        private PlayerState _state;
+        public static bool CanMove = true, CanShoot = true;
+
+        private bool _grounded;
         // Start is called before the first frame update
         void Start()
         {
@@ -23,13 +37,17 @@ namespace Player
         // Update is called once per frame
         void Update()
         {
-            Walk();
-            if (Input.GetKeyDown(KeyCode.Space) && _isGrounded())
-            {
-                Jump();
+            if(CanMove){
+                Walk();
+                if (Input.GetKeyDown(KeyCode.Space) && _isGrounded())
+                {
+                    Jump();
+                }
+                    
             }
-        
+            
             UpdateSprite();
+            
         }
 
         private void Walk()
@@ -40,16 +58,33 @@ namespace Player
 
         private void UpdateSprite()
         {
+            if (!CanMove)
+            {
+                _animator.SetInteger("state", (int) PlayerState.Idle);
+                return;
+            }
+
             if(_horizontal > 0)
             {
                 transform.localScale = new Vector3(1, 1, 1);
+                _state = PlayerState.Running;
             }
             else if(_horizontal < 0)
             {
                 transform.localScale = new Vector3(-1, 1, 1);
+                _state = PlayerState.Running;
             }
-        
-            _animator.SetBool("running", _horizontal != 0);
+            else
+            {
+                _state = PlayerState.Idle;
+            }
+            
+            //check if player is jumping
+            if (_body.velocity.y > .1f)
+            {
+                _state = PlayerState.Jumping;
+            }
+            _animator.SetInteger("state", (int) _state);
         }
 
         private void Jump()
@@ -57,14 +92,8 @@ namespace Player
             _body.velocity = new Vector2(_body.velocity.x, 5f);
         }
 
-        private void OnCollisionEnter2D(Collision2D other)
-        {
-            Debug.Log(other.gameObject.name);
-        }
-
         private bool _isGrounded()
         {
-            Debug.Log("Checking if grounded");
             var bounds = _collider.bounds;
             return Physics2D.BoxCast(bounds.center, bounds.size, 0f, 
                 Vector2.down, .1f, _groundLayer);
