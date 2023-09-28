@@ -20,17 +20,18 @@ public class PlayerAttack : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButton(0) && _cooldownTimer > _attackCooldown && _movement.CanAttack())
+        if (Input.GetMouseButton(0) && _cooldownTimer > _attackCooldown && _movement.CanAttack() && PlayerMovement.CanShoot)
         {
             Attack();
+            Debug.Log("Attack!");
         }
-        
+
         _cooldownTimer += Time.deltaTime;
     }
 
     private void Attack()
     {
-        _animator.SetTrigger("attack");
+        _animator.SetInteger("state", (int) PlayerState.Attacking);
         _cooldownTimer = 0f;
     }
 }
