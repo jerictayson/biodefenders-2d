@@ -1,4 +1,5 @@
 using System.Collections;
+using Player;
 using TMPro;
 using UnityEngine;
 
@@ -17,6 +18,7 @@ public class DialogTutorial : MonoBehaviour
     private bool isTriggered;
     [SerializeField]
     private float _wordDelay = 0.1f;
+    [SerializeField]
     
     private bool _aPressed;
     private bool _dPressed;
@@ -53,7 +55,25 @@ public class DialogTutorial : MonoBehaviour
         {
             _continueButton.SetActive(false);
         }
-        
+
+        if (_index is 1 or 2 && _dialog.activeInHierarchy)
+        {
+            PlayerMovement.CanMove = true;
+            if(_index == 1)
+                PlayerMovement.CanShoot = false;
+            else 
+                PlayerMovement.CanShoot = true;
+        }else if(_dialog.activeInHierarchy)
+        {
+            PlayerMovement.CanMove = false;
+            PlayerMovement.CanShoot = false;
+        }
+        else if (!_dialog.activeInHierarchy)
+        {
+            PlayerMovement.CanMove = true;
+            PlayerMovement.CanShoot = true;
+        }
+
         if (isTriggered)
         {
             if (Input.GetKeyDown(KeyCode.A))
